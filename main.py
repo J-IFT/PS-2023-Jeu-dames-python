@@ -10,6 +10,6 @@ import ia
 
 # Création plateau
 plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
-
-ia.play(plateau,True)
 print(plateau)
+deplacement = ia.play(plateau,True)
+print(deplacement)
