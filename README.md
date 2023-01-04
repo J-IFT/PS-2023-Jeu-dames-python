@@ -30,8 +30,19 @@ Pions
 Dames
 
 • La Dame est un Pion spécial qui peut avancer, mais également reculer pour se déplacer.
-• Contrairement aux règles officielles, la dame ne peut pas se déplacer de plusieurs cases
-dans cette version.
+• Contrairement aux règles officielles, la dame ne peut pas se déplacer de plusieurs cases dans cette version.
+
+Captures
+
+• Il est possible de “capturer” un pièce de l’adversaire
+• Les captures, qu’elles soient exécutées par des Pions ou des Dames se font en avançant ou en
+reculant : un Pion peut donc reculer en capturant une pièce (et uniquement en capturant).
+• Contrairement aux règles officielles, il n’est pas obligatoire dans cette version de
+capturer une pièce quand cela est possible.
+• Contrairement aux règles officielles, lorsqu’une pièce (Pion ou Dame) capture et se
+retrouve de nouveau en diagonal d’une pièce adverse cette pièce NE peut PAS re-capturer
+au même tour (le tour s’arrête).
+
 
 ### 💻 Applications et langages utilisés :
 
