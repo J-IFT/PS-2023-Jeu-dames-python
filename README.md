@@ -43,6 +43,15 @@ capturer une pièce quand cela est possible.
 retrouve de nouveau en diagonal d’une pièce adverse cette pièce NE peut PAS re-capturer
 au même tour (le tour s’arrête).
 
+Conditions de victoire
+
+• Si un joueur n’a plus de pièce, il perd la partie.
+• Si un joueur ne peut déplacer aucune pièce lors d’un tour de jeu, il perd la partie.
+• Si aucun joueur n’a été déclaré vainqueur après 1,000 tours de jeu par joueur (soit 2000
+tours de jeu en tout), on considère que la partie est nulle.
+
+[voir pdf]
+
 
 ### 💻 Applications et langages utilisés :
 
