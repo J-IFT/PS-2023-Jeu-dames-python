@@ -30,7 +30,7 @@ def jouer(plateau,coup):
 	plateau[coup[0]-1] = None
 	
 	if(coup[2] != None):
-		if(plateau[coup[2]-1] == 'Dame'):
+		if(coup[2]-1 == 'Dame'):
 			plateau[coup[1]-1][1] = True
 		else:
 			plateau[coup[2]-1] = None
@@ -73,6 +73,7 @@ def afficher_plateau():
 			x1, y1 = i * 50, j * 50
 			x2, y2 = x1 + 50, y1 + 50
 			canvas.create_rectangle(x1, y1, x2, y2, fill=couleur, outline="black")
+	#TODO Affichage du nombre de piece mangé par chaque joueur (ou nb de piece restant sur le plateau)
 
 	# Refresh des pions sur la grille
 	def refresh(plateau,fenetre,canvas):
@@ -84,6 +85,7 @@ def afficher_plateau():
 			k = int(i/5)
 			j = int(2*(i%5)+add)
 			if(element != None):
+				#TODO affichage different pour les dames
 				if(element[0] == 0):
 					canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="white")
 				else:
@@ -120,6 +122,7 @@ def afficher_plateau():
 			joueur = True
 		vainceur = iSvictoire(plateau)
 		time.sleep(2)
+		#TODO gestion du joueur (choix coup, possibilités,..)
 # Exemple d'utilisation
 afficher_plateau()
 
