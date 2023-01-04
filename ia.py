@@ -22,6 +22,7 @@ def play(grille,premier_joueur):
 			else:
 				increments = [4,5] if premier_joueur else [-6,-5]
 
+			#TODO géré les déplacements d'une dame (anvant et arriere)
 			deplacements_possible = [] # Correspond aux deux cases ou peux se déplacer le pion
 			if(case%10 != 6):
 				incr = 9 if premier_joueur else -11
