@@ -18,37 +18,40 @@ def play(grille,premier_joueur):
 		
 		if(grille[case-1] == [ia, False] or grille[case-1] == [ia,True]):
 			if(case%10 in [1,2,3,4,5]):
-				increments = [5,6]
+				increments = [5,6] if premier_joueur else [-5,-4]
 			else:
-				increments = [4,5]
+				increments = [4,5] if premier_joueur else [-6,-5]
 
 			deplacements_possible = [] # Correspond aux deux cases ou peux se déplacer le pion
 			if(case%10 != 6):
-				if(case%10 == 1 or case+9>50):
+				incr = 9 if premier_joueur else -11
+				if(case%10 == 1 or case+incr>50):
 					deplacements_possible.append([case+increments[0],None])
 				else:
-					deplacements_possible.append([case+increments[0],case+9])
+					deplacements_possible.append([case+increments[0],case+incr])
 			if(case%10 != 5):
-				if(case%10 == 0 or case+11>50):
+				incr = 11 if premier_joueur else -9
+				if(case%10 == 0 or case+incr>50):
 					deplacements_possible.append([case+increments[1],None])
 				else:
-					deplacements_possible.append([case+increments[1],case+11])
+					deplacements_possible.append([case+increments[1],case+incr])
 
 			for destination in deplacements_possible:
 				if(destination[1] != None):
 					if(grille[destination[0]-1]==[joueur,True] and grille[destination[1]-1] == None):
 						# Manger une dame
-						manger_dame.append([case,destination[1]])
+						manger_dame.append([case,destination[1],destination[0]])
 					if(grille[destination[0]-1] == [joueur,False] and grille[destination[1]-1] == None):
 						# Manger un pion
-						manger_pion.append([case, destination[1]])
+						manger_pion.append([case, destination[1],destination[0]])
 				if(destination[0] <= 50):
-					if(destination[0] in [46,47,48,49,50] and grille[destination[0]-1] == None):
+					ligne_fin = [46,47,48,49,50] if premier_joueur else [1,2,3,4,5]
+					if(destination[0] in ligne_fin and grille[destination[0]-1] == None):
 						# Obtenir une dame
-						obtenir_dame.append([case,destination[0]])
+						obtenir_dame.append([case,destination[0],'dame'])
 					if(grille[destination[0]-1] == None):
 						# bouger un pion
-						deplacer_pion.append([case,destination[0]])
+						deplacer_pion.append([case,destination[0],None])
 
 	if(len(manger_dame)):
 		return random.choice(manger_dame)
