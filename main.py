@@ -1,4 +1,4 @@
-from tkinter import * 
+import tkinter as tk
 import ia
 import time
 
@@ -55,26 +55,90 @@ def iSvictoire(plateau):
 		return None
 
 
-# fenetre = Tk()
 
-# label = Label(fenetre, text="Hello World")
-# label.pack()
+def afficher_plateau():
+	# Créer une fenêtre tkinter
+	fenetre = tk.Tk()
+	fenetre.title("Jeu de Dames")
 
-# fenetre.mainloop()
+	# Créer un canvas dans la fenêtre pour dessiner le plateau de jeu
+	canvas = tk.Canvas(fenetre, width=600, height=600)
+	canvas.pack()
 
-# Création plateau
-plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
+	# Dessiner le plateau de jeu en dessinant des carrés blancs et noirs
+	plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
+	for i in range(10):
+		for j in range(10):
+			couleur = "white" if (i + j) % 2 == 0 else "lightgrey"
+			x1, y1 = i * 50, j * 50
+			x2, y2 = x1 + 50, y1 + 50
+			canvas.create_rectangle(x1, y1, x2, y2, fill=couleur, outline="black")
 
-vainceur = None
-joueur = True
-while(vainceur == None):
-	afficher(plateau)
-	jouer(plateau,ia.play(plateau,joueur))
-	if(joueur):
-		joueur = False
-	else:
-		joueur = True
-	vainceur = iSvictoire(plateau)
-	time.sleep(5)
+	# Refresh des pions sur la grille
+	def refresh(plateau,fenetre,canvas):
+		for i, element in enumerate(plateau):
+			if(int(i/5)%2 == 0):
+				add = 1
+			else:
+				add = 0
+			k = int(i/5)
+			j = int(2*(i%5)+add)
+			if(element != None):
+				if(element[0] == 0):
+					canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="white")
+				else:
+					canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="black")
+			else:
+				canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="light grey", outline='light grey')
+		fenetre.update()
+	refresh(plateau, fenetre, canvas)
 
-print("Victoire de "+str(vainceur))
+	# Ajouter une gestion d'événement pour savoir si un joueur a cliqué sur un pion
+	def pion_clique(event):
+		# Récupérer les coordonnées du clic de la souris
+		x, y = event.x, event.y
+		# Calculer la ligne et la colonne du pion sélectionné
+		ligne = x // 50
+		colonne = y // 50
+		# Afficher les coordonnées du pion sélectionné
+		print(f"Pion sélectionné : ligne {ligne}, colonne {colonne}")
+
+	canvas.bind("<Button-1>", pion_clique)
+
+	# Afficher la fenêtre
+	# fenetre.mainloop()
+
+	vainceur = None
+	joueur = True
+	while(vainceur == None):
+		print('tour')
+		refresh(plateau, fenetre,canvas)
+		jouer(plateau,ia.play(plateau,joueur))
+		if(joueur):
+			joueur = False
+		else:
+			joueur = True
+		vainceur = iSvictoire(plateau)
+		time.sleep(2)
+# Exemple d'utilisation
+afficher_plateau()
+
+
+
+# Jeu console : 
+	# Création plateau
+	# plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
+
+	# vainceur = None
+	# joueur = True
+	# while(vainceur == None):
+	# 	afficher(plateau)
+	# 	jouer(plateau,ia.play(plateau,joueur))
+	# 	if(joueur):
+	# 		joueur = False
+	# 	else:
+	# 		joueur = True
+	# 	vainceur = iSvictoire(plateau)
+	# 	time.sleep(5)
+
+	# print("Victoire de "+str(vainceur))
