@@ -30,7 +30,7 @@ def jouer(plateau,coup):
 	plateau[coup[0]-1] = None
 	
 	if(coup[2] != None):
-		if(coup[2]-1 == 'Dame'):
+		if(coup[2] == 'dame'):
 			plateau[coup[1]-1][1] = True
 		else:
 			plateau[coup[2]-1] = None
@@ -67,6 +67,7 @@ def afficher_plateau():
 
 	# Dessiner le plateau de jeu en dessinant des carrés blancs et noirs
 	plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
+	# plateau = 20*[None] + 1*[[0,False]] + 1*[[1,False]] + 28*[None]
 	for i in range(10):
 		for j in range(10):
 			couleur = "white" if (i + j) % 2 == 0 else "lightgrey"
@@ -85,11 +86,14 @@ def afficher_plateau():
 			k = int(i/5)
 			j = int(2*(i%5)+add)
 			if(element != None):
-				#TODO affichage different pour les dames
 				if(element[0] == 0):
 					canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="white")
+					if(element[1]):
+						canvas.create_oval(j * 50 + 15, k * 50 + 15, j * 50 + 35, k * 50 + 35, outline='black')
 				else:
 					canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="black")
+					if(element[1]):
+						canvas.create_oval(j * 50 + 15, k * 50 + 15, j * 50 + 35, k * 50 + 35, outline='white')
 			else:
 				canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="light grey", outline='light grey')
 		fenetre.update()
