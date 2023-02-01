@@ -2,6 +2,10 @@ import tkinter as tk
 import ia
 import time
 
+click = None
+vainceur = None
+joueur = 1
+
 def afficher(plateau):
 	print()
 	j = 0
@@ -26,14 +30,18 @@ def afficher(plateau):
 			print('| |')
 
 def jouer(plateau,coup):
+	print(coup)
+	if(len(coup) == 3):
+		if(coup[2] == -1):
+			# Nouvelle dame
+			plateau[coup[0]-1][1] = True
+		else:
+			plateau[coup[2]-1]= None
+	elif(len(coup) == 4):
+		plateau[coup[0]-1][1] = True
+		plateau[coup[2]-1]= None
 	plateau[coup[1]-1] = plateau[coup[0]-1]
 	plateau[coup[0]-1] = None
-	
-	if(coup[2] != None):
-		if(coup[2] == 'dame'):
-			plateau[coup[1]-1][1] = True
-		else:
-			plateau[coup[2]-1] = None
 			
 def iSvictoire(plateau):
 	j1 = False
@@ -54,9 +62,8 @@ def iSvictoire(plateau):
 	else:
 		return None
 
-
-
 def afficher_plateau():
+
 	# Créer une fenêtre tkinter
 	fenetre = tk.Tk()
 	fenetre.title("Jeu de Dames")
@@ -67,7 +74,14 @@ def afficher_plateau():
 
 	# Dessiner le plateau de jeu en dessinant des carrés blancs et noirs
 	plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
-	# plateau = 20*[None] + 1*[[0,False]] + 1*[[1,False]] + 28*[None]
+	# plateau = 20*[None] +[[0,False]]+ [[0,False]] + 1*[[1,False]] + 27*[None]
+	# plateau = 30*[None]+20*[[0, False]]
+	# plateau[32] = [1, False]
+	# plateau[7] = [1, False]
+	# plateau[12] = [0, False]
+	# plateau[24] = [1, False]
+
+
 	for i in range(10):
 		for j in range(10):
 			couleur = "white" if (i + j) % 2 == 0 else "lightgrey"
@@ -87,13 +101,14 @@ def afficher_plateau():
 			j = int(2*(i%5)+add)
 			if(element != None):
 				if(element[0] == 0):
-					canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="white")
-					if(element[1]):
-						canvas.create_oval(j * 50 + 15, k * 50 + 15, j * 50 + 35, k * 50 + 35, outline='black')
-				else:
 					canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="black")
-					if(element[1]):
+					# print(i,' : ',element)
+					if(element[1] == True):
 						canvas.create_oval(j * 50 + 15, k * 50 + 15, j * 50 + 35, k * 50 + 35, outline='white')
+				else:
+					canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="white")
+					if(element[1] == True):
+						canvas.create_oval(j * 50 + 15, k * 50 + 15, j * 50 + 35, k * 50 + 35, outline='black')
 			else:
 				canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="light grey", outline='light grey')
 		fenetre.update()
@@ -106,46 +121,106 @@ def afficher_plateau():
 		# Calculer la ligne et la colonne du pion sélectionné
 		ligne = x // 50
 		colonne = y // 50
+		global click 
+		click = [ligne,colonne]
 		# Afficher les coordonnées du pion sélectionné
-		print(f"Pion sélectionné : ligne {ligne}, colonne {colonne}")
+		
 
 	canvas.bind("<Button-1>", pion_clique)
+	def afficheCoupJouable():
+		ligne = click[0]
+		colonne = click[1]
+		if((ligne+colonne)%2 == 1 and joueur == 0):
+			lignes 	 = [6,1,7,2,8,3,9,4,0,5]
+			colonnes = [0,0,10,10,20,20,30,30,40,40]
+			case = lignes[ligne]+colonnes[colonne]
+			if(plateau[case-1] != None and plateau[case-1][0] == 0):
+				print(f"Pion sélectionné : ligne {ligne}, colonne {colonne}")
+				print('numerocase = '+str(case))
+				deplacements = ia.getDeplacementsPossibles(plateau,case)
+				print('déplacements: '+str(deplacements))
+				# Affichage des déplacements possibles
+				canvas.create_oval(ligne * 50 + 10, colonne * 50 + 10, ligne * 50 + 40, colonne * 50 + 40, fill="blue")
+				fenetre.update()
+				for deplacement_type in deplacements:
+					for deplacement in deplacements[deplacement_type]:
+						print(deplacement)
 
-	# Afficher la fenêtre
-	# fenetre.mainloop()
-
-	vainceur = None
-	joueur = True
-	while(vainceur == None):
-		print('tour')
+	def main():
+		global joueur
 		refresh(plateau, fenetre,canvas)
-		jouer(plateau,ia.play(plateau,joueur))
-		if(joueur):
-			joueur = False
+		if(joueur == 1):
+			coup = ia.play(plateau,joueur)
+			if(coup == None):
+				print('plu de coup')
+				exit
+			jouer(plateau,coup)
+			joueur += 1
+			joueur = joueur%2
 		else:
-			joueur = True
-		vainceur = iSvictoire(plateau)
-		time.sleep(2)
-		#TODO gestion du joueur (choix coup, possibilités,..)
+	# 		#TODO gestion du joueur (choix coup, possibilités,..)
+			if(click != None):
+				afficheCoupJouable()
+		fenetre.after(1000,main)
+	# Afficher la fenêtre
+
+
+	main()
+	fenetre.mainloop()
+
+	# click = None
+	# vainceur = None
+	# joueur = 1
+	
+	# while(vainceur == None):
+	# 	refresh(plateau, fenetre,canvas)
+	# 	if(joueur == 1):
+	# 		coup = ia.play(plateau,joueur)
+	# 		if(coup == None):
+	# 			print('plu de coup')
+	# 			exit
+	# 		jouer(plateau,coup)
+	# 		joueur += 1
+	# 		joueur = joueur%2
+	# 	else:
+	# 		#TODO gestion du joueur (choix coup, possibilités,..)
+	# 		if(click != None):
+	# 			print('click: '+str(click))
+			
+	# 	vainceur = iSvictoire(plateau)
+		# time.sleep(2)
+		
+		
 # Exemple d'utilisation
 afficher_plateau()
 
 
 
 # Jeu console : 
-	# Création plateau
-	# plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
+# Création plateau
+plateau = [[0,True]] + 5*[None] + [[1,False]] + 14*[None] + [[1,True]] + 3*[None] + [[0,False]] + 24*[None]
+plateau = 50*[None]
+# plateau[32] = [1, False]
+plateau[19] = [1, False]
+plateau[24] = [0, False]
+afficher(plateau)
+# plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
+coup = ia.play(plateau,1)
+print('va jouer : '+str(coup))
+if(coup == None):
+	exit
+jouer(plateau, coup)
 
-	# vainceur = None
-	# joueur = True
-	# while(vainceur == None):
-	# 	afficher(plateau)
-	# 	jouer(plateau,ia.play(plateau,joueur))
-	# 	if(joueur):
-	# 		joueur = False
-	# 	else:
-	# 		joueur = True
-	# 	vainceur = iSvictoire(plateau)
-	# 	time.sleep(5)
+# vainceur = None
+# joueur = True
+# while(vainceur == None):
+# 	afficher(plateau)
+# 	jouer(plateau,ia.play(plateau,joueur))
+# 	if(joueur):
+# 		joueur = False
+# 	else:
+# 		joueur = True
+# 	vainceur = iSvictoire(plateau)
+# 	time.sleep(5)
 
-	# print("Victoire de "+str(vainceur))
+# print("Victoire de "+str(vainceur))
