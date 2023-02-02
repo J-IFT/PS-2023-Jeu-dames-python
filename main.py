@@ -2,9 +2,15 @@ import tkinter as tk
 import ia
 import time
 
+# Variables globales :
+# - Joueur :
+choixDeplacement = None
 click = None
-vainceur = None
 joueur = 1
+coups = []
+# - Common
+timer = 0
+vainceur = None
 
 def afficher(plateau):
 	print()
@@ -29,8 +35,17 @@ def afficher(plateau):
 		if(i%5 == 0 and i%10==0):
 			print('| |')
 
-def jouer(plateau,coup):
-	print(coup)
+def getCoordonee(case):
+	i = case-1
+	if(int(i/5)%2 == 0):
+		add = 1
+	else:
+		add = 0
+	k = int(i/5)
+	j = int(2*(i%5)+add)
+	return [j,k]
+
+def jouer(plateau,coup,canvas):
 	if(len(coup) == 3):
 		if(coup[2] == -1):
 			# Nouvelle dame
@@ -81,7 +96,6 @@ def afficher_plateau():
 	# plateau[12] = [0, False]
 	# plateau[24] = [1, False]
 
-
 	for i in range(10):
 		for j in range(10):
 			couleur = "white" if (i + j) % 2 == 0 else "lightgrey"
@@ -112,84 +126,101 @@ def afficher_plateau():
 			else:
 				canvas.create_oval(j * 50 + 10, k * 50 + 10, j * 50 + 40, k * 50 + 40, fill="light grey", outline='light grey')
 		fenetre.update()
+
 	refresh(plateau, fenetre, canvas)
 
 	# Ajouter une gestion d'événement pour savoir si un joueur a cliqué sur un pion
 	def pion_clique(event):
+		global click
+		global choixDeplacement
 		# Récupérer les coordonnées du clic de la souris
 		x, y = event.x, event.y
 		# Calculer la ligne et la colonne du pion sélectionné
 		ligne = x // 50
 		colonne = y // 50
-		global click 
-		click = [ligne,colonne]
-		# Afficher les coordonnées du pion sélectionné
 		
+		if(click == None):
+			click = [ligne,colonne]
+		else:
+			lignes 	 = [6,1,7,2,8,3,9,4,10,5]
+			colonnes = [0,0,10,10,20,20,30,30,40,40]
+			choixDeplacement = lignes[ligne]+ colonnes[colonne]
 
 	canvas.bind("<Button-1>", pion_clique)
 	def afficheCoupJouable():
+		# Afficher les coordonnées du pion sélectionné
+		global coups
 		ligne = click[0]
 		colonne = click[1]
 		if((ligne+colonne)%2 == 1 and joueur == 0):
-			lignes 	 = [6,1,7,2,8,3,9,4,0,5]
+			lignes 	 = [6,1,7,2,8,3,9,4,10,5]
 			colonnes = [0,0,10,10,20,20,30,30,40,40]
 			case = lignes[ligne]+colonnes[colonne]
 			if(plateau[case-1] != None and plateau[case-1][0] == 0):
-				print(f"Pion sélectionné : ligne {ligne}, colonne {colonne}")
-				print('numerocase = '+str(case))
 				deplacements = ia.getDeplacementsPossibles(plateau,case)
-				print('déplacements: '+str(deplacements))
 				# Affichage des déplacements possibles
-				canvas.create_oval(ligne * 50 + 10, colonne * 50 + 10, ligne * 50 + 40, colonne * 50 + 40, fill="blue")
+				if(timer%2 == 1):
+					canvas.create_oval(ligne * 50 + 11, colonne * 50 + 11, ligne * 50 + 39, colonne * 50 + 39, outline="#56f0e5", width=3)
 				fenetre.update()
 				for deplacement_type in deplacements:
 					for deplacement in deplacements[deplacement_type]:
-						print(deplacement)
+						if(deplacement not in coups):
+							coups.append(deplacement)
+						if(len(deplacement) == 3 and deplacement[2] != -1):
+							co = getCoordonee(deplacement[2])
+							k = co[1]
+							j = co[0]
+							canvas.create_line(j*50 +15, k*50 + 15, j*50 + 35, k*50 + 35, fill="red", width=3)
+							canvas.create_line(j*50 +35, k*50 + 15, j*50 + 15, k*50 + 35, fill="red", width=3)
+						if(timer%2 == 0):
+							co = getCoordonee(deplacement[1])
+							k = co[1]
+							j = co[0]
+							canvas.create_oval(j * 50 + 15, k * 50 + 15, j * 50 + 35, k * 50 + 35, fill="#56f0e5")
 
 	def main():
 		global joueur
+		global choixDeplacement
+		global coups
+		global click
+		global timer
+
 		refresh(plateau, fenetre,canvas)
 		if(joueur == 1):
+			# L'IA joue
 			coup = ia.play(plateau,joueur)
 			if(coup == None):
 				print('plu de coup')
 				exit
-			jouer(plateau,coup)
+			jouer(plateau,coup,canvas)
 			joueur += 1
 			joueur = joueur%2
 		else:
-	# 		#TODO gestion du joueur (choix coup, possibilités,..)
+			# Le joueur joue
 			if(click != None):
 				afficheCoupJouable()
-		fenetre.after(1000,main)
+				if(choixDeplacement != None):
+					find = False
+					for coup in coups:
+						if(choixDeplacement == coup[1]):
+							jouer(plateau,coup,canvas)
+							click = None
+							choixDeplacement = None
+							coups = []
+							joueur += 1
+							joueur = joueur%2
+							find = True
+					if(find == False):
+						click = None
+						choixDeplacement = None
+						coups = []
+		timer += 1
+		timer = timer%10
+		fenetre.after(200,main)
+
 	# Afficher la fenêtre
-
-
 	main()
 	fenetre.mainloop()
-
-	# click = None
-	# vainceur = None
-	# joueur = 1
-	
-	# while(vainceur == None):
-	# 	refresh(plateau, fenetre,canvas)
-	# 	if(joueur == 1):
-	# 		coup = ia.play(plateau,joueur)
-	# 		if(coup == None):
-	# 			print('plu de coup')
-	# 			exit
-	# 		jouer(plateau,coup)
-	# 		joueur += 1
-	# 		joueur = joueur%2
-	# 	else:
-	# 		#TODO gestion du joueur (choix coup, possibilités,..)
-	# 		if(click != None):
-	# 			print('click: '+str(click))
-			
-	# 	vainceur = iSvictoire(plateau)
-		# time.sleep(2)
-		
 		
 # Exemple d'utilisation
 afficher_plateau()
@@ -197,19 +228,19 @@ afficher_plateau()
 
 
 # Jeu console : 
-# Création plateau
-plateau = [[0,True]] + 5*[None] + [[1,False]] + 14*[None] + [[1,True]] + 3*[None] + [[0,False]] + 24*[None]
-plateau = 50*[None]
-# plateau[32] = [1, False]
-plateau[19] = [1, False]
-plateau[24] = [0, False]
-afficher(plateau)
-# plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
-coup = ia.play(plateau,1)
-print('va jouer : '+str(coup))
-if(coup == None):
-	exit
-jouer(plateau, coup)
+# # Création plateau
+# plateau = [[0,True]] + 5*[None] + [[1,False]] + 14*[None] + [[1,True]] + 3*[None] + [[0,False]] + 24*[None]
+# plateau = 50*[None]
+# # plateau[32] = [1, False]
+# plateau[19] = [1, False]
+# plateau[24] = [0, False]
+# afficher(plateau)
+# # plateau = 20*[[1,False]] + 10*[None] + 20*[[0,False]]
+# coup = ia.play(plateau,1)
+# print('va jouer : '+str(coup))
+# if(coup == None):
+# 	exit
+# jouer(plateau, coup)
 
 # vainceur = None
 # joueur = True
