@@ -6,7 +6,7 @@
 
 Janvier 2023
 
-Groupe : Juliette, Flavien, Brice & Lucas
+Groupe : Juliette, Flavien & Lucas
 
 ### 📌 Consignes du projet :
 L’objectif de ce TP est de programmer une interface graphique pour le jeu de dames (en version simplifiée) entre joueurs humains ou contre l’ordinateur.
